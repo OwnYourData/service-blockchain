@@ -1,0 +1,26 @@
+{
+  "name": "blockchainapi",
+  "version": "0.0.1",
+  "description": "API for storing hashes in a Blockchain",
+  "main": "server.js",
+  "bin": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js",
+    "package": "pkg . --targets node8-linux-x64,node8-macos-x64 --out-path ./deployables"
+  },
+  "config": {
+    "port": "3010",
+    "privatekey": "",
+    "address": ""
+  },
+  "author": "miro",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.14.11"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "command-line-args": "^4.0.7"
+  }
+}
