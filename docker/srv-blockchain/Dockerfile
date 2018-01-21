@@ -16,6 +16,4 @@ USER docker
 COPY . .
 COPY run.sh /bin/run.sh
 
-EXPOSE 3010
-
 CMD [ "/bin/bash" ]
