@@ -1,11 +1,11 @@
 'use strict';
 
-module.exports = function(app, options) {
+module.exports = function(app) {
   var blockchain = require('../controllers/blockchainController');
-  blockchain.setPrivatekey(options.privatekey);
-  blockchain.setAddress(options.address);
-
 /** create a blockchain transaction with the given hash as textual information. */
   app.route('/create')
-    .post(blockchain.createTransaction);
+    .post(blockchain.sendMessage);
+/** create a blockchain transaction in TESTNET with the given hash as textual information. */
+  app.route('/createTestnet')
+    .post(blockchain.sendMessageTestnet);
 };
