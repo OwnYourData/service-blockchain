@@ -1,8 +1,10 @@
-exports.errorcodes = {
+exports.statusCodes = {
+  'OK' : 200,
   'genericError' : 500,
-   'unableToRetrieveGasPrice' : 501,
-   'unableToRetrieveBalance' : 502,
-   'insufficientFunds' : 503,
+  'unableToRetrieveGasPrice' : 501,
+  'unableToRetrieveBalance' : 502,
+  'insufficientFunds' : 503,
+  'transactionNotOnBlockchain' : 504
  }
 
  exports.constants = {

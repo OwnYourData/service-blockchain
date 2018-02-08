@@ -2,7 +2,7 @@
 
 const configuration = require('../../configuration');
 const constants = require('../../constants').constants;
-const errorcodes = require('../../constants').errorcodes;
+const statusCodes = require('../../constants').statusCodes;
 const apiProduction = require('etherscan-api').init(configuration.nodeapikey);
 const apiTestnet = require('etherscan-api').init(configuration.nodeapikey,'ropsten');
 const ethTx = require('ethereumjs-tx');
@@ -114,16 +114,16 @@ var sendSignedTransaction = function(requestId,tx,res,isTestnet) {
       res.json({
         "id" : requestId,
         "transaction-id" :  success.result,
-        "status" : 200
+        "status" : statusCodes.OK
       });
       console.log('successfully created transaction ' + success.result + ' for request with id ' + requestId);
     })
     .catch(function(err){
       console.error(err);
-      res.statusCode = 500;
+      res.statusCode = statusCodes.genericError;
       res.json({
         "id" : requestId,
-        "status" : 501,
+        "status" : statusCodes.genericError,
         "error" : err
       });
     });
@@ -152,10 +152,10 @@ var checkFundsAndSendEthereumTransaction = function(requestId,data,res,isTestnet
       if(balance < baseFeeWei) {
         var errInsufficientFunds = "Insufficient Funds for transaction. Needed " + ethUnits.convert(baseFeeWei,'wei','eth') + " Ether but got " + ethUnits.convert(balance,'wei','eth');
         console.error(errInsufficientFunds);
-        res.statusCode = errorcodes.insufficientFunds;
+        res.statusCode = statusCodes.insufficientFunds;
         res.json({
           "id" : requestId,
-          "status" : errorcodes.insufficientFunds,
+          "status" : statusCodes.insufficientFunds,
           "error" : errInsufficientFunds
         });
       } else {
@@ -164,30 +164,87 @@ var checkFundsAndSendEthereumTransaction = function(requestId,data,res,isTestnet
     })
     .catch(function(err){
       console.error(err);
-      res.statusCode = errorcodes.unableToRetrieveBalance;
+      res.statusCode = statusCodes.unableToRetrieveBalance;
       res.json({
         "id" : requestId,
-        "status" : errorcodes.unableToRetrieveBalance,
+        "status" : statusCodes.unableToRetrieveBalance,
         "error" : err
       });
     })
   })
   .catch(function(err){
     console.error(err);
-    res.statusCode = errorcodes.unableToRetrieveGasPrice;
+    res.statusCode = statusCodes.unableToRetrieveGasPrice;
     res.json({
       "id" : requestId,
-      "status" : errorcodes.unableToRetrieveGasPrice,
+      "status" : statusCodes.unableToRetrieveGasPrice,
       "error" : err
     });
   });
 
 };
 
+var checkEthereumTransaction = function(requestId, transactionHash, res, isTestnet) {
+  getApi(isTestnet).proxy.eth_getTransactionReceipt(transactionHash)
+  .then(function(success){
+    console.log(success);
+    res.json({
+      "id" : requestId,
+      "transaction-status" :  success.result,
+      "status" : success.result == null ? statusCodes.transactionNotOnBlockchain : statusCodes.OK
+    });
+  })
+  .catch(function(err){
+    console.error(err);
+    res.statusCode = statusCodes.genericError;
+    res.json({
+      "id" : requestId,
+      "status" : statusCodes.genericError,
+      "error" : err
+    });
+  });
+};
+
+var getBalance = function(requestId,res,isTestnet) {
+  getApi(isTestnet).account.balance(_myAddress)
+  .then(function(success){
+      res.statusCode = statusCodes.OK;
+      res.json({
+        "id" : requestId,
+        "balanceEther" : ethUnits.convert(success.result,'wei','eth'),
+        "status" : statusCodes.OK
+      });
+  })
+  .catch(function(err){
+    console.error(err);
+    res.statusCode = statusCodes.genericError;
+    res.json({
+      "id" : requestId,
+      "status" : statusCodes.genericError,
+      "error" : err
+    });
+  });
+}
+
 exports.sendMessage = function(req, res) {
-    checkFundsAndSendEthereumTransaction(req.body.id,req.body.hash,res, false);
+  checkFundsAndSendEthereumTransaction(req.body.id,req.body.hash,res, false);
 };
 
 exports.sendMessageTestnet = function(req, res) {
-    checkFundsAndSendEthereumTransaction(req.body.id,req.body.hash,res, true);
+  checkFundsAndSendEthereumTransaction(req.body.id,req.body.hash,res, true);
 };
+
+exports.getTransactionStatus = function(req, res) {
+  checkEthereumTransaction(req.body.id,req.body.hash,res, false);
+};
+
+exports.getTransactionStatusTestnet = function(req, res) {
+  checkEthereumTransaction(req.body.id,req.body.hash,res, true);
+};
+
+exports.getBalance = function(req, res) {
+  getBalance(req.body.id,res,false);
+}
+exports.getBalanceTestnet = function(req, res) {
+  getBalance(req.body.id,res,true);
+}
