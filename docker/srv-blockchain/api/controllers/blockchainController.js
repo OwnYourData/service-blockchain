@@ -37,7 +37,8 @@ var _nonceTestnet
   //production nonce
   apiProduction.proxy.eth_getTransactionCount(_myAddress)
   .then(function(success) {
-    var _nonceProduction = ethUtil.addHexPrefix(success.result);
+    var nonceHex = ethUtil.addHexPrefix(success.result);
+    _nonceProduction = new Number(success.result);
     console.log('nonce initalised with value: ',_nonceProduction);
   })
   .catch(function(err) {
@@ -48,8 +49,7 @@ var _nonceTestnet
   apiTestnet.proxy.eth_getTransactionCount(_myAddress)
   .then(function(success) {
     var nonceHex = ethUtil.addHexPrefix(success.result);
-    console.log(nonceHex)
-   _nonceTestnet = new Number(nonceHex) + constants.nonceMinimumTestnet +3; //FIXME
+   _nonceTestnet = new Number(nonceHex) + constants.nonceMinimumTestnet;
     console.log('Testnet nonce initalised with value: ',_nonceTestnet);
   })
   .catch(function(err) {
@@ -133,7 +133,6 @@ var checkFundsAndSendEthereumTransaction = function(requestId,data,res,isTestnet
   getApi(isTestnet).proxy.eth_gasPrice()
   .then(function(success) {
     var gasPriceHex;
-    //var correctedGasPriceHex = decimalToHex(hexToDecimal(gasPriceHex)*2);
     if(isTestnet) {
       gasPriceHex = decimalToHex(50000000000);//eth_gasPrice does not give correct value for testnet.
     } else {
