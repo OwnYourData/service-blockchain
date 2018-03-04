@@ -94,7 +94,7 @@ var createSignedTransaction = function(data, gasPriceHex,isTestnet) {
     "gasPrice":ethUtil.addHexPrefix(gasPriceHex),
     "gasLimit":0,
     "to":_myAddress,
-    "value":"0x1",
+    "value":"0x0",
     "data":data,
     "chainId":getChainId(isTestnet)
   };
