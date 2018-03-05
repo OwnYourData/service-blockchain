@@ -101,7 +101,6 @@ var createSignedTransaction = function(data, gasPriceHex,isTestnet) {
   const tx = new ethTx(txParams);
   tx.gasLimit = ethUtil.addHexPrefix(tx.getBaseFee().muln(constants.safetyFactorGasLimit).toString(16));
   console.log(txParams);
-  console.log(tx.gasLimit);
   tx.sign(privatekey);
   return tx;
 }
@@ -119,7 +118,7 @@ var sendSignedTransaction = function(requestId,tx,res,isTestnet) {
       console.log('successfully created transaction ' + success.result + ' for request with id ' + requestId);
     })
     .catch(function(err){
-      console.error(err);
+      console.error("Error sending signed transaction: ", err);
       res.statusCode = statusCodes.genericError;
       res.json({
         "id" : requestId,
