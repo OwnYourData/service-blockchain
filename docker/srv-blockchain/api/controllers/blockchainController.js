@@ -185,12 +185,41 @@ var checkFundsAndSendEthereumTransaction = function(requestId,data,res,isTestnet
 var checkEthereumTransaction = function(requestId, transactionHash, res, isTestnet) {
   getApi(isTestnet).proxy.eth_getTransactionReceipt(transactionHash)
   .then(function(success){
-    console.log(success);
-    res.json({
-      "id" : requestId,
-      "transaction-status" :  success.result,
-      "status" : success.result == null ? statusCodes.transactionNotOnBlockchain : statusCodes.OK
-    });
+    console.log('Transaction found: ' , success);
+    if(success.result != null) {
+      getApi(isTestnet).proxy.eth_getBlockByNumber(success.result.blockNumber, false)
+      .then(function(blockSuccess) {
+            console.log('Block found: ' , blockSuccess);
+        if(blockSuccess != null) {
+          success.result.blockTimestamp = blockSuccess.result.timestamp;
+        }
+        else {
+          success.result.blockTimestamp = 'unknown';
+        }
+        console.log('Timestamp is: ' , blockSuccess.result.timestamp);
+        res.json({
+          "id" : requestId,
+          "transaction-status" :  success.result,
+          "status" : statusCodes.OK
+        });
+      })
+      .catch(function(blockErr) {
+        console.error(blockErr);
+        res.statusCode = statusCodes.genericError;
+        res.json({
+          "id" : requestId,
+          "status" : statusCodes.genericError,
+          "error" : 'could not retrieve block information. ' + blockErr
+        });
+      });
+    }
+    else {
+      res.json({
+        "id" : requestId,
+        "transaction-status" :  success.result,
+        "status" : statusCodes.transactionNotOnBlockchain
+      });
+    }
   })
   .catch(function(err){
     console.error(err);
@@ -198,7 +227,7 @@ var checkEthereumTransaction = function(requestId, transactionHash, res, isTestn
     res.json({
       "id" : requestId,
       "status" : statusCodes.genericError,
-      "error" : err
+      "error" : 'Could not retrieve transaction-status. ' + err
     });
   });
 };
