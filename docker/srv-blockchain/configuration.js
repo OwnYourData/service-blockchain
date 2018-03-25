@@ -23,6 +23,13 @@ var assertPrivatekey = function() {
   }
 };
 
+var assertNodeApiKey = function() {
+  if(!_nodeApikey) {
+    console.error('Error: No API key given.');
+    process.exit(1);
+  }
+};
+
 (function () {
   const commandLineArgs = require('command-line-args');
   const options = commandLineArgs([
@@ -32,9 +39,10 @@ var assertPrivatekey = function() {
   ]);
   _port = options.port || process.env.npm_package_config_port;
   assertPort();
-  _privatekey = options.privatekey || 'e331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109'; //FIXME: Fallback value entfernen
+  _privatekey = options.privatekey;
   assertPrivatekey();
-  _nodeApikey = options.nodeapikey || 'RXBP85DU7UVXRYNRG4QR9FQQ2VAC891ZY5';
+  _nodeApikey = options.nodeapikey;
+  assertNodeApiKey();
 })();
 
 
