@@ -13,3 +13,10 @@ exports.statusCodes = {
    'chainIdTestnet' : 3,
    'nonceMinimumTestnet' : new Number(0x0)
  }
+
+ exports.noncePreferenceStrategy = {
+   'blockchain' : 'blockchain',
+   'local' : 'local',
+   'higher' : 'higher',
+   'lower' : 'lower'
+ }
