@@ -149,23 +149,23 @@ var sendSignedTransaction = async function(requestId,tx,res,isTestnet) {
   var txHex = ethUtil.addHexPrefix(tx.serialize().toString('hex'));
   try {
     var success = await getApi(isTestnet).proxy.eth_sendRawTransaction(txHex);
-      incrementNonce(isTestnet);
-      res.json({
-        "id" : requestId,
-        "transaction-id" :  success.result,
-        "status" : statusCodes.OK
-      });
-      console.log('successfully created transaction ' + success.result + ' for request with id ' + requestId);
-    }
-    catch(err){
-      console.error("Error sending signed transaction: ", err);
-      res.statusCode = statusCodes.genericError;
-      res.json({
-        "id" : requestId,
-        "status" : statusCodes.genericError,
-        "error" : err
-      });
-    }
+    incrementNonce(isTestnet);
+    res.json({
+      "id" : requestId,
+      "transaction-id" :  success.result,
+      "status" : statusCodes.OK
+    });
+    console.log('successfully created transaction ' + success.result + ' for request with id ' + requestId);
+  }
+  catch(err){
+    console.error("Error sending signed transaction: ", err);
+    res.statusCode = statusCodes.genericError;
+    res.json({
+      "id" : requestId,
+      "status" : statusCodes.genericError,
+      "error" : err
+    });
+  }
 }
 
 var checkFundsAndSendEthereumTransaction = async function(requestId,data,res,isTestnet) {
