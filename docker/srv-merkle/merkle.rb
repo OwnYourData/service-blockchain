@@ -83,7 +83,7 @@ response.each do |item|
 	item_hash = Digest::SHA256.digest(item['value'])
 	id_array << item_id
 	hash_array << item_hash
-	puts item_id.to_s + ": " + Base64.encode64(item_hash).rstrip
+	# puts item_id.to_s + ": " + Base64.encode64(item_hash).rstrip
 
 	# write merkel.id in item
 	update_item_url = config["pia_url"] + '/api/items/' + item_id.to_s
@@ -97,24 +97,24 @@ end
 serialized_object = Base64.encode64(Marshal::dump(mht)).strip
 root_node = mht.head().unpack('H*')[0]
 
-puts "===================\n"
-puts "root_node: " + root_node.to_s
+# puts "===================\n"
+# puts "root_node: " + root_node.to_s
 
 # request transaction
 blockchain_url = 'http://' + ENV["DOCKER_LINK_BC"].to_s + ':3010/create'
-puts "blockchain_url: " + blockchain_url.to_s
+# puts "blockchain_url: " + blockchain_url.to_s
 response = HTTParty.post(blockchain_url,
 	            headers: { 'Content-Type' => 'application/json'},
 	            body: { id:   merkle_id, 
 	                    hash: root_node }.to_json ).parsed_response
-puts "repsonse: " + response.to_s
+# puts "repsonse: " + response.to_s
 oyd_transaction = response['transaction-id']
 
 # update merkel record and store
 update_merkle_url = config["pia_url"] + '/api/merkles/' + merkle_id.to_s
 response = HTTParty.put(update_merkle_url,
 		    headers: headers,
-		    body: { payload:         id_array.to_json,
+		    body: { payload:     id_array.to_json,
 		    		merkle_tree:     serialized_object,
 		    		root_hash:       root_node,
 		    		oyd_transaction: oyd_transaction }.to_json )

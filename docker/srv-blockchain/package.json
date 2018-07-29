@@ -16,7 +16,7 @@
   "author": "miro",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^1.14.11"
+    "nodemon": "^1.18.3"
   },
   "dependencies": {
     "command-line-args": "4.0.7",
