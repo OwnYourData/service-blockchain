@@ -1,4 +1,4 @@
-FROM ruby:2.4-stretch
+FROM ruby:2.5.3
 MAINTAINER "Christoph Fabianek" christoph@ownyourdata.eu
 
 RUN mkdir /usr/src/app
