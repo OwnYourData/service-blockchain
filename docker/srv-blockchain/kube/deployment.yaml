@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ethereum-blockchain-service-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ethereum-blockchain-service
+  template:
+    metadata:
+      labels:
+        app: ethereum-blockchain-service
+    spec:
+      containers:
+      - name: ethereum-blockchain-service
+        image: oydeu/srv-blockchain:latest
+        command: ["/bin/run.sh"]
+        args: ["--port=$(SRV_PORT)", 
+               "--nodeapikey=$(API_KEY)",
+               "--privatekey=$(PRIVATE_KEY)",
+               "--noncepreference=$(SRV_NONCE)"]
+        ports:
+        - containerPort: 3000
+        env:
+          - name: LANG
+            value: C.UTF-8
+          - name: SRV_PORT
+            value: 3000
+          - name: SRV_NONCE,
+            value: blockchain
+          - name: API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: ethereum-blockchain-service-secrets
+                key: api-key
+          - name: PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: ethereum-blockchain-service-secrets
+                key: private-key
