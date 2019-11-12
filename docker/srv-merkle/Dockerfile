@@ -7,12 +7,12 @@ RUN useradd docker \
         && mkdir /home/docker \
         && chown docker:docker /home/docker \
         && addgroup docker staff
-USER docker
+USER docker 
 
-RUN gem install \
-        httparty \
-        merkle-hash-tree \
-        digest
+COPY merkle-hash-tree/*.gem .
+RUN gem install *.gem \
+    && gem install \
+           httparty
 
 COPY merkle.rb .
 COPY run.sh /bin/run.sh
